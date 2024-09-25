@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using vilavelha_case.Attributes;
 
 namespace vilavelha_case.Models;
 public class Task
@@ -17,7 +18,22 @@ public class Task
     [EnumDataType(typeof(TaskStatus), ErrorMessage = "O campo \"Status\" deve ser um valor válido.")]
     public string Status { get; set; }
 
-    public DateTime? DueDate { get; set; }
+    private DateTime? _DueDate;
+    [DueDate]
+    public DateTime? DueDate
+    {
+        get => _DueDate; set
+        {
+            if (value.HasValue && value.Value.Kind != DateTimeKind.Utc)
+            {
+                _DueDate = DateTime.SpecifyKind(value.Value, DateTimeKind.Utc);
+            }
+            else
+            {
+                _DueDate = value;
+            }
+        }
+    }
 
     public Task(string title, string? description, string status, DateTime? dueDate)
     {

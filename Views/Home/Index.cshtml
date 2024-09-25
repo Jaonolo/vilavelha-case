@@ -1,8 +1,61 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using System.ComponentModel.DataAnnotations
+@using System.Reflection
+@{
+    ViewData["Title"] = "Taskify";
+}
+@await Html.PartialAsync("~/Views/Shared/Partials/_AddEditModal.cshtml")
+@await Html.PartialAsync("~/Views/Shared/Partials/_DeleteModal.cshtml")
+@await Html.PartialAsync("~/Views/Shared/Partials/_TaskDetailsModal.cshtml")
+
+<div class="px-5 py-3 d-flex flex-column index-body">
+    <div class="mb-4 d-flex justify-content-between flex-grow-1 flex-column flex-md-row">
+        <h1 class="fs-2 fw-bold">Suas Tarefas</h4>
+            <div class="d-flex gap-3">
+                <button class="btn btn-primary" id="add-button">Adicionar Tarefa</button>
+            </div>
+    </div>
+    <div id="task-list" class="d-flex flex-column gap-3 px-md-3 px-0">
+    </div>
+</div>
+
+@section Sidebar {
+    <aside class="d-none d-md-block sidebar">
+        <div class="container">
+            <!-- Sidebar content will be injected here -->
+        </div>
+    </aside>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasLabel">Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <!-- Offcanvas content will be injected here -->
+        </div>
+    </div>
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@{
+    var taskStatus = Enum.GetValues(typeof(vilavelha_case.Models.TaskStatus))
+    .Cast<vilavelha_case.Models.TaskStatus>()
+    .ToDictionary(
+    t => t.ToString(), // The key is the string name of the enum value
+    t => t.GetType()
+    .GetMember(t.ToString())
+    .First()
+    .GetCustomAttribute<DisplayAttribute>()?.GetName() ?? t.ToString() // The value is the Display name or the enum name
+    );
+
+
+    var taskStatusJson = Json.Serialize(taskStatus);
+}
+
+@section Scripts {
+    <script>
+        const taskStatus = @Html.Raw(taskStatusJson);
+    </script>
+    <script src="~/js/tasksService.js" asp-append-version="true"></script>
+    <script src="~/js/utils.js" asp-append-version="true"></script>
+    <script src="~/js/main.js" asp-append-version="true"></script>
+}
